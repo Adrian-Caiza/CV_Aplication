@@ -1,49 +1,51 @@
-// components/CVPreview.tsx
-
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { CVData } from "../types/cv.types";
 
 interface CVPreviewProps {
   cvData: CVData;
 }
 
-export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
+export const CVPreview = ({ cvData }: CVPreviewProps) => {
   const { personalInfo, experiences, education } = cvData;
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Header con información personal */}
+        {/* Header con foto */}
         <View style={styles.header}>
-          <Text style={styles.name}>
-            {personalInfo.fullName || "Tu Nombre"}
-          </Text>
-          <View style={styles.contactInfo}>
+          {personalInfo.profileImage && (
+            <Image
+              source={{ uri: personalInfo.profileImage }}
+              style={styles.profileImage}
+            />
+          )}
+          <View style={styles.headerText}>
+            <Text style={styles.name}>{personalInfo.fullName || "Nombre"}</Text>
             {personalInfo.email && (
-              <Text style={styles.contactText}>📧 {personalInfo.email}</Text>
+              <Text style={styles.contact}>📧 {personalInfo.email}</Text>
             )}
             {personalInfo.phone && (
-              <Text style={styles.contactText}>📱 {personalInfo.phone}</Text>
+              <Text style={styles.contact}>📱 {personalInfo.phone}</Text>
             )}
             {personalInfo.location && (
-              <Text style={styles.contactText}>📍 {personalInfo.location}</Text>
+              <Text style={styles.contact}>📍 {personalInfo.location}</Text>
             )}
           </View>
         </View>
 
-        {/* Resumen profesional */}
+        {/* Resumen */}
         {personalInfo.summary && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>RESUMEN PROFESIONAL</Text>
-            <Text style={styles.summaryText}>{personalInfo.summary}</Text>
+            <Text style={styles.sectionTitle}>Resumen Profesional</Text>
+            <Text style={styles.text}>{personalInfo.summary}</Text>
           </View>
         )}
 
-        {/* Experiencia laboral */}
+        {/* Experiencia */}
         {experiences.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>EXPERIENCIA LABORAL</Text>
+            <Text style={styles.sectionTitle}>Experiencia Laboral</Text>
             {experiences.map((exp) => (
               <View key={exp.id} style={styles.item}>
                 <Text style={styles.itemTitle}>{exp.position}</Text>
@@ -62,33 +64,19 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
         {/* Educación */}
         {education.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>EDUCACIÓN</Text>
+            <Text style={styles.sectionTitle}>Educación</Text>
             {education.map((edu) => (
               <View key={edu.id} style={styles.item}>
                 <Text style={styles.itemTitle}>{edu.degree}</Text>
                 {edu.field && (
                   <Text style={styles.itemSubtitle}>{edu.field}</Text>
                 )}
-                <Text style={styles.itemInstitution}>{edu.institution}</Text>
-                {edu.graduationYear && (
-                  <Text style={styles.itemDate}>{edu.graduationYear}</Text>
-                )}
+                <Text style={styles.itemSubtitle}>{edu.institution}</Text>
+                <Text style={styles.itemDate}>{edu.graduationYear}</Text>
               </View>
             ))}
           </View>
         )}
-
-        {/* Mensaje si no hay datos */}
-        {!personalInfo.fullName &&
-          experiences.length === 0 &&
-          education.length === 0 && (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>
-                No hay información para mostrar.{"\n"}
-                Completa las secciones para ver tu CV.
-              </Text>
-            </View>
-          )}
       </View>
     </ScrollView>
   );
@@ -103,21 +91,28 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#3498db",
-    paddingBottom: 16,
+    flexDirection: "row",
     marginBottom: 24,
+    alignItems: "center",
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginRight: 16,
+    borderWidth: 3,
+    borderColor: "#3498db",
+  },
+  headerText: {
+    flex: 1,
   },
   name: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "bold",
     color: "#2c3e50",
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  contactInfo: {
-    gap: 4,
-  },
-  contactText: {
+  contact: {
     fontSize: 14,
     color: "#7f8c8d",
     marginBottom: 4,
@@ -126,22 +121,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#3498db",
     marginBottom: 12,
-    letterSpacing: 1,
+    borderBottomWidth: 2,
+    borderBottomColor: "#3498db",
+    paddingBottom: 4,
   },
-  summaryText: {
+  text: {
     fontSize: 14,
-    color: "#34495e",
+    color: "#2c3e50",
     lineHeight: 20,
   },
   item: {
     marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ecf0f1",
   },
   itemTitle: {
     fontSize: 16,
@@ -152,34 +146,17 @@ const styles = StyleSheet.create({
   itemSubtitle: {
     fontSize: 14,
     color: "#7f8c8d",
-    marginBottom: 4,
-  },
-  itemInstitution: {
-    fontSize: 14,
-    color: "#95a5a6",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   itemDate: {
     fontSize: 12,
     color: "#95a5a6",
-    fontStyle: "italic",
-    marginBottom: 8,
+    marginBottom: 4,
   },
   itemDescription: {
-    fontSize: 13,
-    color: "#34495e",
-    lineHeight: 18,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#95a5a6",
-    textAlign: "center",
-    lineHeight: 24,
+    fontSize: 14,
+    color: "#2c3e50",
+    lineHeight: 20,
+    marginTop: 4,
   },
 });

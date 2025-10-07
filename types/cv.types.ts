@@ -6,6 +6,7 @@ export interface PersonalInfo {
   phone: string;
   location: string;
   summary: string;
+  profileImage?: string;
 }
 
 export interface Experience {

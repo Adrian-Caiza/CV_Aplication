@@ -36,10 +36,17 @@ export default function RootLayout() {
             title: "Experiencia Laboral",
           }}
         />
+
         <Stack.Screen
           name="education"
           options={{
             title: "Educación",
+          }}
+        />
+         <Stack.Screen
+          name="photo"
+          options={{
+            title: "Foto de Perfil",
           }}
         />
         <Stack.Screen
