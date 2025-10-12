@@ -1,6 +1,6 @@
 // app/experience.tsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,13 +11,61 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { InputField } from "../components/InputField";
+import { DatePickerField } from "../components/DatePickerField";
 import { NavigationButton } from "../components/NavigationButton";
 import { useCVContext } from "../context/CVContext";
 import { Experience } from "../types/cv.types";
 
+const useDatePicker = (initialStartDate = "", initialEndDate = "") => {
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
+
+  const getStartDateAsDate = (): Date | undefined => {
+    if (!startDate) return undefined;
+    
+    try {
+      // Convertir string de fecha a Date object (formato: "enero 2020")
+      const [month, year] = startDate.split(' ');
+      const date = new Date(`${month} 1, ${year}`);
+      
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    } catch (error) {
+      console.error("Error parsing date:", error);
+    }
+    
+    return undefined;
+  };
+
+  const resetDates = () => {
+    setStartDate("");
+    setEndDate("");
+  };
+
+  return {
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    getStartDateAsDate,
+    resetDates,
+  };
+};
+
+
 export default function ExperienceScreen() {
   const router = useRouter();
   const { cvData, addExperience, deleteExperience } = useCVContext();
+
+  const {
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    getStartDateAsDate,
+    resetDates,
+  } = useDatePicker();
 
   const [formData, setFormData] = useState<Omit<Experience, "id">>({
     company: "",
@@ -26,6 +74,22 @@ export default function ExperienceScreen() {
     endDate: "",
     description: "",
   });
+
+  const [errors, setErrors] = useState({
+    company: "",
+    position: "",
+    startDate: "",
+    endDate: "",
+    description: "",
+  });
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      startDate,
+      endDate,
+    }));
+  }, [startDate, endDate]);
 
   const handleAdd = () => {
     if (!formData.company || !formData.position || !formData.startDate) {
@@ -75,28 +139,61 @@ export default function ExperienceScreen() {
           label="Empresa *"
           placeholder="Nombre de la empresa"
           value={formData.company}
-          onChangeText={(text) => setFormData({ ...formData, company: text })}
+          onChangeText={(text) => {
+              setFormData({ ...formData, company: text });
+              if (text.trim() === "") {
+                setErrors({ ...errors, company: "La empresa es obligatoria" });
+              } else if (text.length < 2) {
+                setErrors({...errors, company: "El nombre de la empresa es muy corto"});
+              } else {
+                  setErrors({ ...errors, company: "" }); 
+              }       
+          } }
         />
+        {errors.company ? (
+          <Text style={{ color: "red", fontSize: 12, marginTop: 4 }}>
+          {errors.company}
+          </Text>
+        ) : null}
 
         <InputField
           label="Cargo *"
           placeholder="Tu posición"
           value={formData.position}
-          onChangeText={(text) => setFormData({ ...formData, position: text })}
+          onChangeText={(text) => {
+              setFormData({ ...formData, position: text });
+              if (text.trim() === "") {
+                setErrors({ ...errors, position: "El cargo es obligatorio" });
+              } else if (text.length < 2) {
+                setErrors({ ...errors, position: "Debe tener al menos 2 caracteres" });
+              } else {
+                setErrors({ ...errors, position: "" });
+              }
+          } }
         />
+        {errors.company ? (
+          <Text style={{ color: "red", fontSize: 12, marginTop: 4 }}>
+          {errors.position}
+          </Text>
+        ) : null}
 
-        <InputField
-          label="Fecha de Inicio *"
+        <DatePickerField
+          label="Fecha de Inicio"
+          value={startDate}
+          onChange={setStartDate}
           placeholder="Ej: Enero 2020"
-          value={formData.startDate}
-          onChangeText={(text) => setFormData({ ...formData, startDate: text })}
+          required={true}
+          maximumDate={new Date()}
         />
 
-        <InputField
+        <DatePickerField
           label="Fecha de Fin"
-          placeholder="Ej: Diciembre 2023 o 'Actual'"
-          value={formData.endDate}
-          onChangeText={(text) => setFormData({ ...formData, endDate: text })}
+          value={endDate}
+          onChange={setEndDate}
+          placeholder="Ej: Diciembre 2023"
+          maximumDate={new Date()}
+          minimumDate={getStartDateAsDate()}
+          showCurrentOption={true}
         />
 
         <InputField
