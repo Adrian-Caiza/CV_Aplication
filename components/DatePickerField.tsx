@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
+type DateFormat = "full" | "year";
+
 interface DatePickerFieldProps {
     label: string;
     value: string;
@@ -11,7 +13,9 @@ interface DatePickerFieldProps {
     maximumDate?: Date;
     minimumDate?: Date;
     showCurrentOption?: boolean;
+    formatType?: DateFormat;
     onCurrentPress?: () => void;
+    error?: string;
 }
 
 export const DatePickerField: React.FC<DatePickerFieldProps> = ({
@@ -23,28 +27,33 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
     maximumDate,
     minimumDate,
     showCurrentOption = false,
+    formatType,
     onCurrentPress,
+    error,
 }) => {
     const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
     const showDatePicker = () => {
         setDatePickerVisible(true);
-};
+    };
 
     const hideDatePicker = () => {
         setDatePickerVisible(false);
     };
 
     const handleConfirm = (date: Date) => {
-        const formattedDate = formatDate(date);
+        const formattedDate = formatDate(date, formatType);
         onChange(formattedDate);
         hideDatePicker();
     };
 
-    const formatDate = (date: Date): string => {
-        return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
+    const formatDate = (date: Date, formatType: DateFormat = "full"): string => {
+        if (formatType === "year") {
+        return date.getFullYear().toString();
+        }
+        return date.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
         });
     };
 
@@ -63,9 +72,9 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
             {label}
             {required && <Text style={styles.required}> *</Text>}
         </Text>
-        
-        <TouchableOpacity 
-            style={styles.dateInput}
+
+        <TouchableOpacity
+            style={[styles.dateInput, error && styles.inputError]}
             onPress={showDatePicker}
         >
             <Text style={value ? styles.dateText : styles.placeholderText}>
@@ -74,13 +83,15 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
         </TouchableOpacity>
 
         {showCurrentOption && (
-            <TouchableOpacity 
-            style={styles.currentButton}
-            onPress={handleCurrentPress}
-            >
-            <Text style={styles.currentButtonText}>🎯 Actualmente trabajando aquí</Text>
+            <TouchableOpacity style={styles.currentButton} onPress={handleCurrentPress}>
+            <Text style={styles.currentButtonText}>
+                🎯 Actualmente trabajando aquí
+            </Text>
             </TouchableOpacity>
         )}
+
+        {/* Mostrar mensaje de error debajo */}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -93,13 +104,12 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
             cancelTextIOS="Cancelar"
             confirmTextIOS="Confirmar"
             is24Hour={true}
-            // Eliminamos headerTextIOS ya que no es una prop válida
         />
         </View>
     );
     };
 
-    const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         marginBottom: 16,
     },
@@ -121,6 +131,9 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
         height: 50,
         justifyContent: "center",
     },
+    inputError: {
+        borderColor: "#e74c3c",
+    },
     dateText: {
         fontSize: 16,
         color: "#2c3e50",
@@ -140,5 +153,10 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
         color: "#3498db",
         fontSize: 14,
         fontWeight: "500",
+    },
+    errorText: {
+        color: "#e74c3c",
+        fontSize: 12,
+        marginTop: 4,
     },
     });

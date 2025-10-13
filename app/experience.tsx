@@ -1,13 +1,11 @@
-// app/experience.tsx
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  TouchableOpacity,
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    Alert,
+    TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { InputField } from "../components/InputField";
@@ -15,108 +13,47 @@ import { DatePickerField } from "../components/DatePickerField";
 import { NavigationButton } from "../components/NavigationButton";
 import { useCVContext } from "../context/CVContext";
 import { Experience } from "../types/cv.types";
-
-const useDatePicker = (initialStartDate = "", initialEndDate = "") => {
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
-
-  const getStartDateAsDate = (): Date | undefined => {
-    if (!startDate) return undefined;
-    
-    try {
-      // Convertir string de fecha a Date object (formato: "enero 2020")
-      const [month, year] = startDate.split(' ');
-      const date = new Date(`${month} 1, ${year}`);
-      
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    } catch (error) {
-      console.error("Error parsing date:", error);
-    }
-    
-    return undefined;
-  };
-
-  const resetDates = () => {
-    setStartDate("");
-    setEndDate("");
-  };
-
-  return {
-    startDate,
-    endDate,
-    setStartDate,
-    setEndDate,
-    getStartDateAsDate,
-    resetDates,
-  };
-};
-
+import { useForm, Controller, FieldErrors } from "react-hook-form";
 
 export default function ExperienceScreen() {
   const router = useRouter();
   const { cvData, addExperience, deleteExperience } = useCVContext();
 
   const {
-    startDate,
-    endDate,
-    setStartDate,
-    setEndDate,
-    getStartDateAsDate,
-    resetDates,
-  } = useDatePicker();
-
-  const [formData, setFormData] = useState<Omit<Experience, "id">>({
-    company: "",
-    position: "",
-    startDate: "",
-    endDate: "",
-    description: "",
-  });
-
-  const [errors, setErrors] = useState({
-    company: "",
-    position: "",
-    startDate: "",
-    endDate: "",
-    description: "",
-  });
-
-  useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
-      startDate,
-      endDate,
-    }));
-  }, [startDate, endDate]);
-
-  const handleAdd = () => {
-    if (!formData.company || !formData.position || !formData.startDate) {
-      Alert.alert(
-        "Error",
-        "Por favor completa al menos empresa, cargo y fecha de inicio"
-      );
-      return;
-    }
-
-    const newExperience: Experience = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-
-    addExperience(newExperience);
-
-    // Limpiar formulario
-    setFormData({
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<Omit<Experience, "id">>({
+    defaultValues: {
       company: "",
       position: "",
       startDate: "",
       endDate: "",
       description: "",
-    });
+    },
+  });
 
+  const startDateValue = watch("startDate");
+
+  const onSubmit = (data: Omit<Experience, "id">) => {
+    const newExperience: Experience = {
+      id: Date.now().toString(),
+      ...data,
+    };
+
+    addExperience(newExperience);
     Alert.alert("Éxito", "Experiencia agregada correctamente");
+    reset();
+  };
+
+  const onError = (errors: FieldErrors<Omit<Experience, "id">>) => {
+    const firstError = Object.values(errors)[0];
+    const message = (firstError as any)?.message;
+    if (message) {
+      Alert.alert("Error", message);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -130,86 +67,153 @@ export default function ExperienceScreen() {
     ]);
   };
 
+  const today = new Date();
+
+  // Helper para convertir string "mes año" a objeto Date
+  const parseDate = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined;
+    try {
+      const [month, year] = dateString.split(" ");
+      const date = new Date(`${month} 1, ${year}`);
+      return isNaN(date.getTime()) ? undefined : date;
+    } catch {
+      return undefined;
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Agregar Nueva Experiencia</Text>
 
-        <InputField
-          label="Empresa *"
-          placeholder="Nombre de la empresa"
-          value={formData.company}
-          onChangeText={(text) => {
-              setFormData({ ...formData, company: text });
-              if (text.trim() === "") {
-                setErrors({ ...errors, company: "La empresa es obligatoria" });
-              } else if (text.length < 2) {
-                setErrors({...errors, company: "El nombre de la empresa es muy corto"});
-              } else {
-                  setErrors({ ...errors, company: "" }); 
-              }       
-          } }
+        {/* Empresa */}
+        <Controller
+          control={control}
+          name="company"
+          rules={{
+            required: "La empresa es obligatoria",
+            minLength: {
+              value: 2,
+              message: "El nombre de la empresa es muy corto (mínimo 2 caracteres)",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <InputField
+              label="Empresa *"
+              placeholder="Nombre de la empresa"
+              value={value}
+              onChangeText={onChange}
+              error={errors.company?.message}
+            />
+          )}
         />
-        {errors.company ? (
-          <Text style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-          {errors.company}
-          </Text>
-        ) : null}
 
-        <InputField
-          label="Cargo *"
-          placeholder="Tu posición"
-          value={formData.position}
-          onChangeText={(text) => {
-              setFormData({ ...formData, position: text });
-              if (text.trim() === "") {
-                setErrors({ ...errors, position: "El cargo es obligatorio" });
-              } else if (text.length < 2) {
-                setErrors({ ...errors, position: "Debe tener al menos 2 caracteres" });
-              } else {
-                setErrors({ ...errors, position: "" });
+        {/* Cargo */}
+        <Controller
+          control={control}
+          name="position"
+          rules={{
+            required: "El cargo es obligatorio",
+            minLength: {
+              value: 2,
+              message: "Debe tener al menos 2 caracteres",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <InputField
+              label="Cargo *"
+              placeholder="Tu posición"
+              value={value}
+              onChangeText={onChange}
+              error={errors.position?.message}
+            />
+          )}
+        />
+
+        {/* Fecha de inicio */}
+        <Controller
+          control={control}
+          name="startDate"
+          rules={{
+            required: "La fecha de inicio es obligatoria",
+          }}
+          render={({ field: { onChange, value } }) => (
+            <DatePickerField
+              label="Fecha de Inicio *"
+              value={value}
+              onChange={onChange}
+              placeholder="Ej: Enero 2020"
+              required={true}
+              maximumDate={today}
+              error={errors.startDate?.message}
+            />
+          )}
+        />
+
+        {/* Fecha de fin */}
+        <Controller
+          control={control}
+          name="endDate"
+          rules={{
+            validate: (value) => {
+              if (!value) return true;
+              if (value === "Actual") return true;
+              const start = parseDate(startDateValue);
+              const end = parseDate(value);
+              if (start && end && end < start) {
+                return "La fecha de fin no puede ser anterior a la fecha de inicio";
               }
-          } }
-        />
-        {errors.company ? (
-          <Text style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-          {errors.position}
-          </Text>
-        ) : null}
-
-        <DatePickerField
-          label="Fecha de Inicio"
-          value={startDate}
-          onChange={setStartDate}
-          placeholder="Ej: Enero 2020"
-          required={true}
-          maximumDate={new Date()}
-        />
-
-        <DatePickerField
-          label="Fecha de Fin"
-          value={endDate}
-          onChange={setEndDate}
-          placeholder="Ej: Diciembre 2023"
-          maximumDate={new Date()}
-          minimumDate={getStartDateAsDate()}
-          showCurrentOption={true}
+              return true;
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <DatePickerField
+              label="Fecha de Fin"
+              value={value}
+              onChange={onChange}
+              placeholder="Ej: Diciembre 2023"
+              maximumDate={today}
+              minimumDate={parseDate(startDateValue)}
+              showCurrentOption={true}
+              error={errors.endDate?.message}
+            />
+          )}
         />
 
-        <InputField
-          label="Descripción"
-          placeholder="Describe tus responsabilidades y logros..."
-          value={formData.description}
-          onChangeText={(text) =>
-            setFormData({ ...formData, description: text })
-          }
-          multiline
-          numberOfLines={4}
-          style={{ height: 100, textAlignVertical: "top" }}
+        {/* Descripción */}
+        <Controller
+          control={control}
+          name="description"
+          rules={{
+            validate: (value) => {
+              if (value.trim() === "") return true;
+              if (value.length < 10)
+                return "La descripción es muy corta (mínimo 10 caracteres)";
+              if (value.length > 500)
+                return "La descripción es muy larga (máximo 500 caracteres)";
+              return true;
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <InputField
+              label="Descripción"
+              placeholder="Describe tus responsabilidades y logros..."
+              value={value}
+              onChangeText={onChange}
+              multiline
+              numberOfLines={4}
+              style={{ height: 100, textAlignVertical: "top" }}
+              error={errors.description?.message}
+            />
+          )}
         />
 
-        <NavigationButton title="Agregar Experiencia" onPress={handleAdd} />
+        <NavigationButton
+          title="Agregar Experiencia"
+          onPress={handleSubmit(onSubmit, onError)}
+        />
 
+        {/* Lista de experiencias */}
         {cvData.experiences.length > 0 && (
           <>
             <Text style={styles.listTitle}>Experiencias Agregadas</Text>
@@ -245,13 +249,8 @@ export default function ExperienceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  content: {
-    padding: 20,
-  },
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
+  content: { padding: 20 },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -277,24 +276,10 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  cardContent: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2c3e50",
-    marginBottom: 4,
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: "#7f8c8d",
-    marginBottom: 4,
-  },
-  cardDate: {
-    fontSize: 12,
-    color: "#95a5a6",
-  },
+  cardContent: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: "600", color: "#2c3e50", marginBottom: 4 },
+  cardSubtitle: { fontSize: 14, color: "#7f8c8d", marginBottom: 4 },
+  cardDate: { fontSize: 12, color: "#95a5a6" },
   deleteButton: {
     width: 32,
     height: 32,
@@ -303,9 +288,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  deleteButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  deleteButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
 });

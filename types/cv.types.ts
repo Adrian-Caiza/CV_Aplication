@@ -1,5 +1,3 @@
-// types/cv.types.ts
-
 export interface PersonalInfo {
   fullName: string;
   email: string;
@@ -26,8 +24,15 @@ export interface Education {
   graduationYear: string;
 }
 
+export interface Skill {
+  id: string;
+  name: string;
+  level: "Basico" | "Intermedio" | "Avanzado" | "Experto";
+}
+
 export interface CVData {
   personalInfo: PersonalInfo;
   experiences: Experience[];
   education: Education[];
+  skills: Skill[];
 }

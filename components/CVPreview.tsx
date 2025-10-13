@@ -7,7 +7,7 @@ interface CVPreviewProps {
 }
 
 export const CVPreview = ({ cvData }: CVPreviewProps) => {
-  const { personalInfo, experiences, education } = cvData;
+  const { personalInfo, experiences, education, skills } = cvData;
 
   return (
     <ScrollView style={styles.container}>
@@ -75,6 +75,21 @@ export const CVPreview = ({ cvData }: CVPreviewProps) => {
                 <Text style={styles.itemDate}>{edu.graduationYear}</Text>
               </View>
             ))}
+          </View>
+        )}
+
+        {/* Habilidades */}
+        {skills.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Habilidades</Text>
+            <View style={styles.skillsContainer}>
+              {skills.map((skill) => (
+                <View key={skill.id} style={styles.skillItem}>
+                  <Text style={styles.skillName}>{skill.name}</Text>
+                  <Text style={styles.skillLevel}>{skill.level}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
       </View>
@@ -158,5 +173,30 @@ const styles = StyleSheet.create({
     color: "#2c3e50",
     lineHeight: 20,
     marginTop: 4,
+  },
+  skillsContainer: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  marginTop: 8,
+  },
+  skillItem: {
+  backgroundColor: "#ecf6fd",
+  borderWidth: 1,
+  borderColor: "#3498db",
+  borderRadius: 8,
+  paddingVertical: 6,
+  paddingHorizontal: 10,
+  marginRight: 8,
+  marginBottom: 8,
+  alignItems: "center",
+  },
+  skillName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#2c3e50",
+  },
+  skillLevel: {
+    fontSize: 12,
+    color: "#3498db",
   },
 });

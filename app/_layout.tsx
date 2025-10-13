@@ -1,5 +1,3 @@
-// app/_layout.tsx
-
 import { Stack } from "expo-router";
 import { CVProvider } from "../context/CVContext";
 
@@ -43,7 +41,7 @@ export default function RootLayout() {
             title: "Educación",
           }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="photo"
           options={{
             title: "Foto de Perfil",
@@ -54,6 +52,12 @@ export default function RootLayout() {
           options={{
             title: "Vista Previa",
             presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="skills"
+          options={{
+            title: "Habilidades",
           }}
         />
       </Stack>
