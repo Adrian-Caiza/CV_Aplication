@@ -16,9 +16,9 @@ export default function HomeScreen() {
 
   const isPersonalInfoComplete =
     cvData.personalInfo.fullName && cvData.personalInfo.email;
-  const hasExperience = cvData.experiences.length > 0;
-  const hasEducation = cvData.education.length > 0;
-  const hasPhoto = !!cvData.personalInfo.profileImage;
+    const hasExperience = cvData.experiences.length > 0;
+    const hasEducation = cvData.education.length > 0;
+    const hasPhoto = !!cvData.personalInfo.profileImage;
 
   return (
     <ScrollView

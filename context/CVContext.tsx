@@ -11,7 +11,6 @@ interface CVContextType {
   updateEducation: (id: string, edu: Education) => void;
   deleteEducation: (id: string) => void;
   addSkill: (skill: Skill) => void;
-  //updateSkill: (id: string, skill: Skill) => void;
   deleteSkill: (id: string) => void;
 }
 
