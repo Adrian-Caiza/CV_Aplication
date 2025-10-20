@@ -1,202 +1,88 @@
 import React from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { View, Text, Image } from "react-native";
 import { CVData } from "../types/cv.types";
 
-interface CVPreviewProps {
+interface Props {
   cvData: CVData;
 }
 
-export const CVPreview = ({ cvData }: CVPreviewProps) => {
+export const CVPreview: React.FC<Props> = ({ cvData }) => {
   const { personalInfo, experiences, education, skills } = cvData;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* Header con foto */}
-        <View style={styles.header}>
-          {personalInfo.profileImage && (
-            <Image
-              source={{ uri: personalInfo.profileImage }}
-              style={styles.profileImage}
-            />
-          )}
-          <View style={styles.headerText}>
-            <Text style={styles.name}>{personalInfo.fullName || "Nombre"}</Text>
-            {personalInfo.email && (
-              <Text style={styles.contact}>📧 {personalInfo.email}</Text>
-            )}
-            {personalInfo.phone && (
-              <Text style={styles.contact}>📱 {personalInfo.phone}</Text>
-            )}
-            {personalInfo.location && (
-              <Text style={styles.contact}>📍 {personalInfo.location}</Text>
-            )}
+    <View className="bg-white rounded-xl p-4">
+      {/* Foto y nombre */}
+      <View className="items-center mb-4">
+        {personalInfo.profileImage ? (
+          <Image source={{ uri: personalInfo.profileImage }} className="w-24 h-24 rounded-full mb-3" />
+        ) : (
+          <View className="w-24 h-24 rounded-full bg-gray-300 mb-3 items-center justify-center">
+            <Text className="text-gray-600 text-sm">Sin foto</Text>
+          </View>
+        )}
+        <Text className="text-2xl font-bold text-darkText">{personalInfo.fullName}</Text>
+        {personalInfo.location && <Text className="text-gray-600">{personalInfo.location}</Text>}
+      </View>
+
+      {/* Contacto */}
+      <View className="mb-4">
+        <Text className="text-lg font-semibold text-darkText mb-1">Contacto</Text>
+        <Text className="text-gray-700">📧 {personalInfo.email}</Text>
+        {personalInfo.phone && <Text className="text-gray-700">📞 {personalInfo.phone}</Text>}
+      </View>
+
+      {/* Resumen */}
+      {personalInfo.summary && (
+        <View className="mb-4">
+          <Text className="text-lg font-semibold text-darkText mb-1">Resumen</Text>
+          <Text className="text-gray-700">{personalInfo.summary}</Text>
+        </View>
+      )}
+
+      {/* Experiencia */}
+      {experiences.length > 0 && (
+        <View className="mb-4">
+          <Text className="text-lg font-semibold text-darkText mb-2">Experiencia</Text>
+          {experiences.map((exp) => (
+            <View key={exp.id} className="mb-3">
+              <Text className="font-semibold text-darkText">{exp.position}</Text>
+              <Text className="text-gray-600">{exp.company}</Text>
+              <Text className="text-gray-400 text-xs">{exp.startDate} - {exp.endDate || "Actual"}</Text>
+              {exp.description ? <Text className="text-gray-700 mt-1">{exp.description}</Text> : null}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Educación */}
+      {education.length > 0 && (
+        <View className="mb-4">
+          <Text className="text-lg font-semibold text-darkText mb-2">Educación</Text>
+          {education.map((edu) => (
+            <View key={edu.id} className="mb-3">
+              <Text className="font-semibold text-darkText">{edu.degree}</Text>
+              <Text className="text-gray-600">{edu.institution}</Text>
+              <Text className="text-gray-400 text-xs">{edu.graduationYear}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Habilidades */}
+      {skills.length > 0 && (
+        <View>
+          <Text className="text-lg font-semibold text-darkText mb-2">Habilidades</Text>
+          <View className="flex-row flex-wrap">
+            {skills.map((skill) => (
+              <View key={skill.id} className="bg-gray-200 rounded-full px-3 py-1 mr-2 mb-2">
+                <Text className="text-gray-700 text-sm">
+                  {skill.name} ({skill.level})
+                </Text>
+              </View>
+            ))}
           </View>
         </View>
-
-        {/* Resumen */}
-        {personalInfo.summary && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Resumen Profesional</Text>
-            <Text style={styles.text}>{personalInfo.summary}</Text>
-          </View>
-        )}
-
-        {/* Experiencia */}
-        {experiences.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Experiencia Laboral</Text>
-            {experiences.map((exp) => (
-              <View key={exp.id} style={styles.item}>
-                <Text style={styles.itemTitle}>{exp.position}</Text>
-                <Text style={styles.itemSubtitle}>{exp.company}</Text>
-                <Text style={styles.itemDate}>
-                  {exp.startDate} - {exp.endDate || "Actual"}
-                </Text>
-                {exp.description && (
-                  <Text style={styles.itemDescription}>{exp.description}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Educación */}
-        {education.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Educación</Text>
-            {education.map((edu) => (
-              <View key={edu.id} style={styles.item}>
-                <Text style={styles.itemTitle}>{edu.degree}</Text>
-                {edu.field && (
-                  <Text style={styles.itemSubtitle}>{edu.field}</Text>
-                )}
-                <Text style={styles.itemSubtitle}>{edu.institution}</Text>
-                <Text style={styles.itemDate}>{edu.graduationYear}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Habilidades */}
-        {skills.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Habilidades</Text>
-            <View style={styles.skillsContainer}>
-              {skills.map((skill) => (
-                <View key={skill.id} style={styles.skillItem}>
-                  <Text style={styles.skillName}>{skill.name}</Text>
-                  <Text style={styles.skillLevel}>{skill.level}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-      </View>
-    </ScrollView>
+      )}
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  content: {
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    marginBottom: 24,
-    alignItems: "center",
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginRight: 16,
-    borderWidth: 3,
-    borderColor: "#3498db",
-  },
-  headerText: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 8,
-  },
-  contact: {
-    fontSize: 14,
-    color: "#7f8c8d",
-    marginBottom: 4,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#3498db",
-    marginBottom: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: "#3498db",
-    paddingBottom: 4,
-  },
-  text: {
-    fontSize: 14,
-    color: "#2c3e50",
-    lineHeight: 20,
-  },
-  item: {
-    marginBottom: 16,
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2c3e50",
-    marginBottom: 4,
-  },
-  itemSubtitle: {
-    fontSize: 14,
-    color: "#7f8c8d",
-    marginBottom: 2,
-  },
-  itemDate: {
-    fontSize: 12,
-    color: "#95a5a6",
-    marginBottom: 4,
-  },
-  itemDescription: {
-    fontSize: 14,
-    color: "#2c3e50",
-    lineHeight: 20,
-    marginTop: 4,
-  },
-  skillsContainer: {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  marginTop: 8,
-  },
-  skillItem: {
-  backgroundColor: "#ecf6fd",
-  borderWidth: 1,
-  borderColor: "#3498db",
-  borderRadius: 8,
-  paddingVertical: 6,
-  paddingHorizontal: 10,
-  marginRight: 8,
-  marginBottom: 8,
-  alignItems: "center",
-  },
-  skillName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#2c3e50",
-  },
-  skillLevel: {
-    fontSize: 12,
-    color: "#3498db",
-  },
-});

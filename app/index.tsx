@@ -3,7 +3,6 @@ import React from "react";
 import {
   Image,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -21,210 +20,71 @@ export default function HomeScreen() {
     const hasPhoto = !!cvData.personalInfo.profileImage;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={true}
-    >
-      <Text style={styles.title}>Crea tu CV Profesional</Text>
+    <ScrollView className="flex-1 bg-lightGray" contentContainerStyle={{ padding: 20 }}>
+      <Text className="text-2xl font-bold mb-5 text-darkText text-center">Crea tu CV Profesional</Text>
 
-      {/* Sección: Foto de Perfil */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <View style={styles.sectionInfo}>
-            <Text style={styles.sectionTitle}>Foto de Perfil</Text>
-            <Text style={styles.status}>
-              {hasPhoto ? "✓ Agregada" : "Opcional"}
-            </Text>
+      {/* Foto */}
+      <View className="bg-white p-4 rounded-xl mb-4 shadow">
+        <View className="flex-row justify-between items-center mb-3">
+          <View className="flex-1">
+            <Text className="text-lg font-semibold text-darkText">Foto de Perfil</Text>
+            <Text className="text-sm text-green-600">{hasPhoto ? "✓ Agregada" : "Opcional"}</Text>
           </View>
           {hasPhoto && cvData.personalInfo.profileImage && (
-            <Image
-              source={{ uri: cvData.personalInfo.profileImage }}
-              style={styles.thumbnail}
-            />
+            <Image source={{ uri: cvData.personalInfo.profileImage }} className="w-12 h-12 rounded-full border-2 border-primary" />
           )}
         </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/photo")}
-        >
-          <Text style={styles.buttonText}>
-            {hasPhoto ? "Cambiar Foto" : "Subir Foto"}
-          </Text>
+
+        <TouchableOpacity className="bg-primary py-4 rounded-lg items-center" onPress={() => router.push("/photo")}>
+          <Text className="text-white font-semibold text-base">{hasPhoto ? "Cambiar Foto" : "Subir Foto"}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sección: Información Personal */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>1. Información Personal</Text>
-        <Text style={styles.status}>
-          {isPersonalInfoComplete ? "✓ Completado" : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/personal-info")}
-        >
-          <Text style={styles.buttonText}>Editar</Text>
+      {/* Info Personal */}
+      <View className="bg-white p-4 rounded-xl mb-4 shadow">
+        <Text className="text-lg font-semibold text-darkText">1. Información Personal</Text>
+        <Text className="text-sm text-green-600 mb-3">{isPersonalInfoComplete ? "✓ Completado" : "Pendiente"}</Text>
+        <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => router.push("/personal-info")}>
+          <Text className="text-white font-semibold">Editar</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sección: Experiencia */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>2. Experiencia</Text>
-        <Text style={styles.status}>
-          {hasExperience
-            ? `✓ ${cvData.experiences.length} agregada(s)`
-            : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/experience")}
-        >
-          <Text style={styles.buttonText}>Agregar</Text>
+      {/* Experiencia */}
+      <View className="bg-white p-4 rounded-xl mb-4 shadow">
+        <Text className="text-lg font-semibold text-darkText">2. Experiencia</Text>
+        <Text className="text-sm text-green-600 mb-3">{hasExperience ? `✓ ${cvData.experiences.length} agregada(s)` : "Pendiente"}</Text>
+        <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => router.push("/experience")}>
+          <Text className="text-white font-semibold">Agregar</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sección: Educación */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>3. Educación</Text>
-        <Text style={styles.status}>
-          {hasEducation
-            ? `✓ ${cvData.education.length} agregada(s)`
-            : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/education")}
-        >
-          <Text style={styles.buttonText}>Agregar</Text>
+      {/* Educación */}
+      <View className="bg-white p-4 rounded-xl mb-4 shadow">
+        <Text className="text-lg font-semibold text-darkText">3. Educación</Text>
+        <Text className="text-sm text-green-600 mb-3">{hasEducation ? `✓ ${cvData.education.length} agregada(s)` : "Pendiente"}</Text>
+        <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => router.push("/education")}>
+          <Text className="text-white font-semibold">Agregar</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sección: Habilidades */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>4. Habilidades</Text>
-        <Text style={styles.status}>
-          {cvData.skills.length > 0
-            ? `✓ ${cvData.skills.length} agregada(s)`
-            : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/skills")}
-        >
-          <Text style={styles.buttonText}>Agregar</Text>
-        </TouchableOpacity>
-      </View>
-      
-      {/* Botón de Vista Previa - Más grande y visible */}
-      <View style={styles.previewSection}>
-        <TouchableOpacity
-          style={styles.previewButton}
-          onPress={() => router.push("/preview")}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.previewButtonIcon}>👁️</Text>
-          <Text style={styles.previewButtonText}>Ver Vista Previa del CV</Text>
+      {/* Habilidades */}
+      <View className="bg-white p-4 rounded-xl mb-4 shadow">
+        <Text className="text-lg font-semibold text-darkText">4. Habilidades</Text>
+        <Text className="text-sm text-green-600 mb-3">{cvData.skills.length > 0 ? `✓ ${cvData.skills.length} agregada(s)` : "Pendiente"}</Text>
+        <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => router.push("/skills")}>
+          <Text className="text-white font-semibold">Agregar</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Espacio adicional al final para evitar que el último elemento quede oculto */}
-      <View style={styles.bottomSpacer} />
+      {/* Preview */}
+      <View className="mt-4 mb-6">
+        <TouchableOpacity className="bg-accent py-5 rounded-xl items-center shadow" onPress={() => router.push("/preview")}>
+          <Text className="text-white font-bold text-lg">👁️ Ver Vista Previa del CV</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className="h-6" />
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 40, // Espacio extra al final
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#2c3e50",
-    textAlign: "center",
-  },
-  section: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  sectionInfo: {
-    flex: 1,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#2c3e50",
-    marginBottom: 8,
-  },
-  status: {
-    fontSize: 14,
-    color: "#27ae60",
-    marginBottom: 12,
-  },
-  thumbnail: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: "#3498db",
-  },
-  button: {
-    backgroundColor: "#3498db",
-    padding: 16,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-    fontWeight: "600",
-  },
-  previewSection: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  previewButton: {
-    backgroundColor: "#2ecc71",
-    padding: 20,
-    borderRadius: 12,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  previewButtonIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  previewButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  bottomSpacer: {
-    height: 20,
-  },
-});

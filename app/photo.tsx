@@ -112,103 +112,35 @@ export default function PhotoScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Foto de Perfil</Text>
+    <View className="flex-1 p-5 bg-lightGray items-center">
+      <Text className="text-xl font-bold text-darkText mb-5 text-center">Foto de Perfil</Text>
 
-      <View style={styles.imageContainer}>
+      <View className="items-center mb-6">
         {selectedImage ? (
-          <Image source={{ uri: selectedImage }} style={styles.image} />
+          <Image source={{ uri: selectedImage }} className="w-48 h-48 rounded-full border-4 border-primary mb-4" />
         ) : (
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>Sin foto</Text>
+          <View className="w-48 h-48 rounded-full bg-gray-300 items-center justify-center mb-4">
+            <Text className="text-gray-600">Sin foto</Text>
           </View>
         )}
-      </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
-          <Text style={styles.actionButtonText}>📷 Tomar Foto</Text>
+        <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mb-3" onPress={takePhoto}>
+          <Text className="text-white font-semibold">📷 Tomar Foto</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
-          <Text style={styles.actionButtonText}>🖼️ Seleccionar de Galería</Text>
+        <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mb-3" onPress={pickImage}>
+          <Text className="text-white font-semibold">🖼️ Seleccionar de Galería</Text>
         </TouchableOpacity>
 
         {selectedImage && (
-          <TouchableOpacity
-            style={[styles.actionButton, styles.removeButton]}
-            onPress={handleRemove}
-          >
-            <Text style={styles.actionButtonText}>🗑️ Eliminar Foto</Text>
+          <TouchableOpacity className="bg-danger py-3 px-6 rounded-lg" onPress={handleRemove}>
+            <Text className="text-white font-semibold">🗑️ Eliminar Foto</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <NavigationButton title="Guardar" onPress={handleSave} />
-
-      <NavigationButton
-        title="Cancelar"
-        onPress={() => router.back()}
-        variant="secondary"
-      />
+      <NavigationButton title="Cancelar" onPress={() => router.back()} variant="secondary" className="mt-4" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  imageContainer: {
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    borderWidth: 3,
-    borderColor: "#3498db",
-  },
-  placeholder: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "#e0e0e0",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#bdc3c7",
-  },
-  placeholderText: {
-    color: "#7f8c8d",
-    fontSize: 16,
-  },
-  buttonContainer: {
-    marginBottom: 20,
-  },
-  actionButton: {
-    backgroundColor: "#3498db",
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-    alignItems: "center",
-  },
-  removeButton: {
-    backgroundColor: "#e74c3c",
-  },
-  actionButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

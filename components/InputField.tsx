@@ -3,53 +3,29 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   TextInputProps,
 } from "react-native";
+
 
 interface InputFieldProps extends TextInputProps {
   label: string;
   error?: string;
 }
 
-export const InputField = ({ label, error, ...props }: InputFieldProps) => {
+export const InputField: React.FC<InputFieldProps> = ({ label, error, ...props }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+    <View className="mb-4">
+      {label && <Text className="text-darkText font-semibold mb-1">{label}</Text>}
       <TextInput
-        style={[styles.input, error && styles.inputError]}
-        placeholderTextColor="#999"
+        className={`bg-white border rounded-lg px-4 py-3 text-darkText ${
+          error ? "border-danger" : "border-gray-300"
+        }`}
+        placeholderTextColor="#9ca3af"
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text className="text-danger text-xs mt-1">{error}</Text>}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  inputError: {
-    borderColor: "#e74c3c",
-  },
-  errorText: {
-    color: "#e74c3c",
-    fontSize: 12,
-    marginTop: 4,
-  },
-});
+

@@ -69,175 +69,68 @@ export default function EducationScreen() {
   const today = new Date();
   const minDate = new Date();
   minDate.setFullYear(today.getFullYear() - 30);
+  const currentYear = new Date().getFullYear();
+
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Agregar Nueva Educación</Text>
+    <ScrollView className="flex-1 bg-lightGray" contentContainerStyle={{ padding: 20 }}>
+      <View>
+        <Text className="text-xl font-bold text-darkText mb-4">Agregar Educación</Text>
 
-        {/* Institución */}
-        <Controller
-          control={control}
-          name="institution"
-          rules={{
-            required: "La institución es obligatoria",
-            minLength: {
-              value: 5,
-              message: "El nombre es muy corto (mínimo 5 caracteres)",
-            },
-          }}
+        <Controller control={control} name="degree" rules={{ required: "El título es obligatorio" }}
           render={({ field: { onChange, value } }) => (
-            <InputField
-              label="Institución *"
-              placeholder="Nombre de la universidad/institución"
-              value={value}
-              onChangeText={onChange}
-              error={errors.institution?.message}
-            />
-          )}
-        />
+            <InputField label="Título *" placeholder="Ej: Ingeniero en Sistemas" value={value} onChangeText={onChange} error={errors.degree?.message} />
+          )} />
 
-        {/* Título/Grado */}
-        <Controller
-          control={control}
-          name="degree"
-          rules={{
-            required: "El título/grado es obligatorio",
-            minLength: {
-              value: 2,
-              message: "El título es muy corto (mínimo 2 caracteres)",
-            },
-          }}
+        <Controller control={control} name="field"
           render={({ field: { onChange, value } }) => (
-            <InputField
-              label="Título/Grado *"
-              placeholder="Ej: Licenciatura, Maestría"
-              value={value}
-              onChangeText={onChange}
-              error={errors.degree?.message}
-            />
-          )}
-        />
+            <InputField label="Campo de Estudio" placeholder="Ej: Desarrollo de Software" value={value} onChangeText={onChange} error={errors.field?.message} />
+          )} />
 
-        {/* Área de estudio */}
-        <Controller
-          control={control}
-          name="field"
-          rules={{
-            validate: (value) =>
-              value === "" || value.length >= 3 || "El área de estudio es muy corta (mínimo 3 caracteres)",
-          }}
+        <Controller control={control} name="institution" rules={{ required: "La institución es obligatoria" }}
           render={({ field: { onChange, value } }) => (
-            <InputField
-              label="Área de Estudio"
-              placeholder="Ej: Ingeniería en Sistemas"
-              value={value}
-              onChangeText={onChange}
-              error={errors.field?.message}
-            />
-          )}
-        />
+            <InputField label="Institución *" placeholder="Nombre de la universidad o instituto" value={value} onChangeText={onChange} error={errors.institution?.message} />
+          )} />
 
-        {/* Año de graduación */}
-        <Controller
-          control={control}
-          name="graduationYear"
+        <Controller control={control} name="graduationYear"
           rules={{
             required: "El año de graduación es obligatorio",
+            validate: (val) => {
+              const num = parseInt(val);
+              if (isNaN(num)) return "Debe ser un número";
+              if (num > currentYear) return "No puede ser un año futuro";
+              if (num < 1950) return "Año no válido";
+              return true;
+            },
           }}
           render={({ field: { onChange, value } }) => (
-            <DatePickerField
-              label="Año de Graduación *"
-              placeholder="Selecciona el año"
-              value={value}
-              formatType="year"
-              maximumDate={today}
-              minimumDate={minDate}
-              onChange={(selectedYear) => onChange(selectedYear)}
-              error={errors.graduationYear?.message}
-            />
-          )}
-        />
+            <InputField label="Año de Graduación *" placeholder="Ej: 2023" keyboardType="numeric" value={value} onChangeText={onChange} error={errors.graduationYear?.message} />
+          )} />
 
-        <NavigationButton
-          title="Agregar Educación"
-          onPress={handleSubmit(onSubmit, onError)}
-        />
+        <NavigationButton title="Agregar Educación" onPress={handleSubmit(onSubmit, onError)} />
 
-        {/* Lista de educación agregada */}
         {cvData.education.length > 0 && (
           <>
-            <Text style={styles.listTitle}>Educación Agregada</Text>
+            <Text className="text-lg font-semibold text-darkText mt-6 mb-3">Educación Agregada</Text>
             {cvData.education.map((edu) => (
-              <View key={edu.id} style={styles.card}>
-                <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle}>{edu.degree}</Text>
-                  <Text style={styles.cardSubtitle}>{edu.field}</Text>
-                  <Text style={styles.cardInstitution}>{edu.institution}</Text>
-                  <Text style={styles.cardDate}>{edu.graduationYear}</Text>
+              <View key={edu.id} className="bg-white rounded-lg p-4 mb-3 flex-row shadow-sm">
+                <View className="flex-1">
+                  <Text className="text-base font-semibold text-darkText mb-1">{edu.degree}</Text>
+                  <Text className="text-sm text-gray-600">{edu.field || "—"}</Text>
+                  <Text className="text-sm text-gray-500">{edu.institution}</Text>
+                  <Text className="text-xs text-gray-400">{edu.graduationYear}</Text>
                 </View>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => handleDelete(edu.id)}
-                >
-                  <Text style={styles.deleteButtonText}>✕</Text>
+                <TouchableOpacity className="w-8 h-8 rounded-full bg-danger items-center justify-center" onPress={() => handleDelete(edu.id)}>
+                  <Text className="text-white text-lg font-bold">✕</Text>
                 </TouchableOpacity>
               </View>
             ))}
           </>
         )}
 
-        <NavigationButton
-          title="Volver"
-          onPress={() => router.back()}
-          variant="secondary"
-          style={{ marginTop: 16 }}
-        />
+        <NavigationButton title="Volver" onPress={() => router.back()} variant="secondary" className="mt-4" />
       </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5" },
-  content: { padding: 20 },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 16,
-  },
-  listTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#2c3e50",
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: "row",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  cardContent: { flex: 1 },
-  cardTitle: { fontSize: 16, fontWeight: "600", color: "#2c3e50", marginBottom: 4 },
-  cardSubtitle: { fontSize: 14, color: "#7f8c8d", marginBottom: 4 },
-  cardInstitution: { fontSize: 14, color: "#95a5a6", marginBottom: 2 },
-  cardDate: { fontSize: 12, color: "#95a5a6" },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#e74c3c",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  deleteButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-});
